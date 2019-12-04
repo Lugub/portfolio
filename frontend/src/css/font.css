@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'PokemonGSC';
+  src: url('../font/gsc/PokemonGSC.svg#PokemonGSC') format('svg'),
+       url('../font/gsc/PokemonGSC.ttf') format('truetype'),
+       url('../font/gsc/PokemonGSC.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'gsc';
+  src: url('../font/gsc/gsc.eot');
+  src: url('../font/gsc/gsc.eot?#iefix') format('embedded-opentype'),
+       url('../font/gsc/gsc.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
