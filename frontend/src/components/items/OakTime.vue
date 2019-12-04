@@ -75,14 +75,21 @@
           <v-col style="width:100%;">
             <v-flex style="background-color:yellow;" >
               방문자 님의 성함은?
+              nameCho : {{ nameCho }}<br>
+              nameJung : {{ nameJung }}<br>
+              nameJong : {{ nameJong}} <br>
             </v-flex>
             <v-row style="background-color:red;">
-              <v-flex>
+              <v-col cols="3">
                 이름 :
-              </v-flex>
-              <v-flex>
-                {{ nameChar }}
-              </v-flex>
+              </v-col>
+              <v-col cols="8">
+                <v-row>
+                  <v-flex v-for="(item, index) in nameChar" class="set-name-td" :class="setNameBorder(index)">
+                    {{ item }}
+                  </v-flex>
+                </v-row>
+              </v-col>
             </v-row>
           </v-col>
           <v-spacer/>
@@ -190,7 +197,7 @@ export default {
     yesnoswi:true,
 
     //set name
-    nameChar:'',
+    nameChar:['□','□','□','□','□','□','□','□','□'],
     name: '루겁',
     nameCursor:0,
     nameCursorRow:0,
@@ -354,6 +361,24 @@ export default {
 
     },
 
+    // name
+    setNameBorder:function(index){
+      let ret = ''
+      if(this.nameChar[index] == '□'){
+        ret = 'set-name-td-transparent';
+      }
+
+      if(index == this.nameCursor){
+        // 밑줄 블링크
+        return ret + ' set-name-td-blink'
+      }else if(index < this.nameCursor){
+        // 밑줄
+        return ret +  ' set-name-td-under'
+      }else{
+        return ' set-name-td-transparent';
+      }
+    },
+
     // name window functions
     setBorder:function(col,row){
       if(this.nameCursorCol == col && this.nameCursorRow == row){
@@ -442,64 +467,100 @@ export default {
       // alert(charnum)
       // alert(word)
       if(type == 'korean'){
-        // 초성
+        // 자음
         if(charnum < 12623){
-          if(this.nameCho == ''){
-            chartype = '초성'
+          // 종성
+          if(this.nameCho != '' && this.nameJung != '' && this.nameJong == ''){
+            if(word == 'ㅉ' || word == 'ㅃ' || word == 'ㄸ' || word == 'ㄲ' || word == 'ㅆ' ){
+              chartype = '초성'
+            }
+            else{
+              chartype = '종성'
+            }
           }
           // 종성
           else{
-            chartype = '종성'
+            chartype = '초성'
           }
         }
-        // 중성
+        // 모음 & 중성
         else{
           chartype = '중성'
         }
 
-        alert(charnum + ' : ' + chartype )
+        // alert(charnum + ' : ' + chartype )
 
         //1. 초성일 경우
         if(chartype == '초성'){
-          this.nameChar += word;
+          if(this.nameCho != '')this.nameCursor++;
+          this.$set(this.nameChar, this.nameCursor, word);
           this.nameCho = word;
+          this.nameJong = ''
+          this.nameJung = ''
         }
 
         //2. 중성일 경우
         else if(chartype == '중성'){
+
           //2-1. 종성이 있을 경우 => 종성을 초성this.nameChar += 으로 바꾸고 그 초성에 중성을 더함
+
           if(this.nameJong != ''){
+            this.nameJung = word;
+
+            let preval = String.fromCharCode(44032 + (this.cCho[this.nameCho]-1) * 588 + (this.cJung[this.nameJung]-1)*28);
+            this.$set(this.nameChar, this.nameCursor, preval);
+
+            this.nameCursor++;
+            this.nameCho = this.nameJong;
+
+            let nextval = String.fromCharCode(44032 + (this.cCho[this.nameCho]-1) * 588 + (this.cJung[word]-1)*28);
+            this.$set(this.nameChar, this.nameCursor, nextval);
+
+            this.nameJong = '';
 
           }
           //2-2. 종성이 없을 경우
           else{
-            //2-2-1. 초성이 있을 경우
+            //2-2-0. 이미 앞에 초성, 중성이 있을 경우
             if(this.nameCho != ''){
-              this.nameChar = this.nameChar.substr(0,this.nameChar.length-1)
-              this.nameJung = word;
-              alert(this.nameCho + " " + this.cCho[this.nameCho] )
-              alert(word + " " + this.cJung[word])
+              if(this.nameJung != ''){
+                this.nameCursor++;
+                this.$set(this.nameChar, this.nameCursor, word);
+                this.nameCursor++;
+                this.nameCho=''
+                this.nameJung=''
 
-              this.nameChar += String.fromCharCode(44032 + (this.cCho[this.nameCho]-1) * 588 + (this.cJung[word]-1)*28)
+              }else{
+                this.$set(this.nameChar, this.nameCursor, String.fromCharCode(44032 + (this.cCho[this.nameCho]-1) * 588 + (this.cJung[word]-1)*28));
+                this.nameJung = word;
+              }
             }
             //2-2-2. 초성이 없을 경우
             else{
-              this.nameChar += word;
+              this.$set(this.nameChar, this.nameCursor, word);
+              this.nameCursor++;
             }
           }
         }
         // 3. 종성일 경우
         else{
-
+          //종성 그냥 일반적인 경우만 할 생각, 추후에 수정을 할 수 도 있으나 그럴 거 같지는 않음
+          this.$set(this.nameChar, this.nameCursor, String.fromCharCode(44032 + (this.cCho[this.nameCho]-1) * 588 + (this.cJung[this.nameJung]-1)*28 + (this.cJong[word]-1) ));
+          this.nameJong = word;
         }
 
       }
       //한글이 아닐 경우
       else{
-        this.nameChar += word;
+        if(this.nameCho != ''){
+            this.nameCursor++;
+        }
+        this.$set(this.nameChar, this.nameCursor, word);
+        this.nameCursor++;
         this.nameCho = '';
         this.nameJung = '';
         this.nameJong = '';
+        return ;
       }
     },
 
@@ -728,7 +789,35 @@ export default {
   }
 }
 
+.set-name-td{
+  border: 2px solid rgba(0, 0, 0, 0);
+  width:10%;
+  height:100%;
+}
 
+.set-name-td-under{
+  border-bottom: 2px solid black;
+}
+
+.set-name-td-blink{
+  -webkit-animation: underlineblink 0.5s linear infinite;
+}
+
+.set-name-td-transparent{
+  color: rgba(0, 0, 0, 0);
+}
+
+@-webkit-keyframes underlineblink{
+  0% {
+    border-bottom: 2px solid rgba(0, 0, 0, 1);
+  }
+  50% {
+    border-bottom: 2px solid rgba(0, 0, 0, 0);
+  }
+  100% {
+    border-bottom: 2px solid rgba(0, 0, 0, 1);
+  }
+}
 
 .yes-or-no{
   font-size:1.5em;
