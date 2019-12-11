@@ -74,14 +74,7 @@
           <v-spacer/>
           <v-col style="width:100%;">
             <v-flex style="background-color:yellow;" >
-<<<<<<< HEAD
-              방문자 님의 성함은?
-              <!-- nameCho : {{ nameCho }}<br>
-              nameJung : {{ nameJung }}<br>
-              nameJong : {{ nameJong}} <br> -->
-=======
               방문자 님의 성함은? {{ btnSwi }}
->>>>>>> a948aa42fa6fd7bffb76a049bc2195962a763967
             </v-flex>
             <v-row style="background-color:red;">
               <v-col cols="3">
@@ -100,8 +93,8 @@
         </v-row>
         <v-flex class="set-name-input">
           <table class="set-name-table">
-            <tr v-for="(line,index) in cTable" >
-              <td v-for="(item,id) in line" class="set-name-box" :class="{'set-name-cursor': setBorder(index,id)}">
+            <tr v-for="(line,index) in cTable" v-bind:key="line">
+              <td v-for="(item,id) in line" class="set-name-box" :class="{'set-name-cursor': setBorder(index,id)}" v-bind:key="item">
                 {{item}}
               </td>
             </tr>
@@ -552,11 +545,11 @@ export default {
           //2-1. 종성이 있을 경우 => 종성을 초성this.nameChar += 으로 바꾸고 그 초성에 중성을 더함
 
           if(this.nameJong != ''){
-            this.nameJung = word;
+
 
             let preval = String.fromCharCode(44032 + (this.cCho[this.nameCho]-1) * 588 + (this.cJung[this.nameJung]-1)*28);
             this.$set(this.nameChar, this.nameCursor, preval);
-
+            this.nameJung = word;
             this.nameCursor++;
             this.nameCho = this.nameJong;
 
@@ -612,14 +605,18 @@ export default {
     },
 
     DeleteName:function(){
+      //만약 현재 커서에 없을 경우 커서를 내리고 이전을 전부 제거
+      if(this.nameChar[this.nameCursor] == '□'){
+        this.$set(this.nameChar, --this.nameCursor, '□');
+      }
 
+      //만약 아닐 경우 해당 커서만 바꿈.
+      else{
         this.$set(this.nameChar, this.nameCursor, '□');
-        if(this.nameCursor != 0){
-          this.nameCursor--;
-        }
-        this.nameCho = '';
-        this.nameJung = '';
-        this.nameJong = '';
+      }
+      this.nameCho = '';
+      this.nameJung = '';
+      this.nameJong = '';
     },
 
     //
