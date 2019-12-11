@@ -75,9 +75,9 @@
           <v-col style="width:100%;">
             <v-flex style="background-color:yellow;" >
               방문자 님의 성함은?
-              nameCho : {{ nameCho }}<br>
+              <!-- nameCho : {{ nameCho }}<br>
               nameJung : {{ nameJung }}<br>
-              nameJong : {{ nameJong}} <br>
+              nameJong : {{ nameJong}} <br> -->
             </v-flex>
             <v-row style="background-color:red;">
               <v-col cols="3">
