@@ -74,10 +74,7 @@
           <v-spacer/>
           <v-col style="width:100%;">
             <v-flex style="background-color:yellow;" >
-              방문자 님의 성함은?
-              nameCho : {{ nameCho }}<br>
-              nameJung : {{ nameJung }}<br>
-              nameJong : {{ nameJong}} <br>
+              방문자 님의 성함은? {{ btnSwi }}
             </v-flex>
             <v-row style="background-color:red;">
               <v-col cols="3">
@@ -85,7 +82,7 @@
               </v-col>
               <v-col cols="8">
                 <v-row>
-                  <v-flex v-for="(item, index) in nameChar" class="set-name-td" :class="setNameBorder(index)">
+                  <v-flex v-for="(item, index) in nameChar" class="set-name-td" :class="setNameBorder(index)" v-bind:key="item">
                     {{ item }}
                   </v-flex>
                 </v-row>
@@ -105,11 +102,11 @@
         </v-flex>
         <v-row style="background-color:grey; height:10%; width:95%;" justify="center" align="center">
           <v-spacer/>
-          <v-flex :class="{'set-name-cursor': setBtnBorder(nameCursorCol, nameCursorCol)}">
+          <v-flex :class="{'set-name-cursor': setBtnDelBorder()}">
             정정
           </v-flex>
           <v-spacer/>
-          <v-flex :class="{'set-name-cursor': setBtnBorder(nameCursorCol, nameCursorCol)}">
+          <v-flex :class="{'set-name-cursor': setBtnConfBorder()}">
             결정
           </v-flex>
           <v-spacer/>
@@ -191,6 +188,7 @@ export default {
     scriptNextSwi:false,
     scriptSwi:true,
     blackSwi:true,
+    btnSwi:false,
 
     //yes or no
     yeswindow:false,
@@ -388,7 +386,25 @@ export default {
     },
 
     //
-    setBtnBorder:function(col, row){
+    setBtnDelBorder:function(){
+
+      if(this.btnSwi){
+        if(this.nameCursorRow % 2 == 1){
+          return true;
+        }
+      }
+      return false;
+
+    },
+
+    setBtnConfBorder:function(){
+
+      if(this.btnSwi){
+        if(this.nameCursorRow % 2 == 0){
+          return true;
+        }
+      }
+      return false;
 
     },
 
@@ -404,8 +420,12 @@ export default {
       // 위로
       else if(e.keyCode == 38){
         this.nameCursorCol--;
+        this.btnSwi = false;
 
-        if(this.nameCursorCol < -1){
+        if(this.nameCursorCol == -1){
+          this.btnSwi = true;
+        }
+        else if(this.nameCursorCol < -1){
           this.nameCursorCol = this.cTable.length - 1;
           return ;
         }
@@ -427,19 +447,39 @@ export default {
       else if(e.keyCode == 40){
 
         this.nameCursorCol++;
-        if(this.nameCursorCol >= this.cTable.length){
-          this.nameCursorCol=0;
+        this.btnSwi = false;
+
+        if(this.nameCursorCol == this.cTable.length){
+          this.btnSwi = true;
+        }
+        else if(this.nameCursorCol >= this.cTable.length+1){
+          this.nameCursorCol= 0;
+          return ;
+        }
+        if(this.nameCursorRow > 14 && this.nameCursorRow % 2 == 1){
+          this.nameCursorRow = 10;
+        }
+        else if(this.nameCursorRow > 14 && this.nameCursorRow % 2 == 0){
+          this.nameCursorRow = 4;
         }
 
       }
 
       // 스페이스
       else if(e.keyCode == 32){
-        if(this.cTable[this.nameCursorCol][this.nameCursorRow] == ' ')return ;
-        if(this.nameChar.length > 10){
-          // 결정 버튼 위치로
+        if(this.btnSwi){
+          // del
+          if(this.nameCursorRow%2 == 1){
+            this.DeleteName();
+          }
+          // confirm
+          else{
+            this.SetNameConfirm();
+          }
           return ;
         }
+        if(this.cTable[this.nameCursorCol][this.nameCursorRow] == ' ')return ;
+
         let charnum = this.cTable[this.nameCursorCol][this.nameCursorRow].charCodeAt(0);
 
         let type;
@@ -566,6 +606,13 @@ export default {
 
     DeleteName:function(){
 
+        this.$set(this.nameChar, this.nameCursor, '□');
+        if(this.nameCursor != 0){
+          this.nameCursor--;
+        }
+        this.nameCho = '';
+        this.nameJung = '';
+        this.nameJong = '';
     },
 
     //
