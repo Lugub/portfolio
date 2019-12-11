@@ -15,14 +15,14 @@
             <v-spacer/>
             <v-flex class="OakProfessor-img" :class="{OakTransparent: blackSwi}" >
               <!-- Professor -->
-              Check
+              <!-- Check
               currentScript : {{ currentScript }}<br>
               ScriptCnt : {{ scriptCnt }}<br>
               ScriptLoadingSwi :  {{ scriptLoadingSwi }}<br>
               currentScriptCnt : {{currentScriptCnt}}<br>
               nameWindowSwi : {{nameWindowSwi}}<br>
               doctorScript : {{doctorScript[scriptCnt]}}<br>
-              scriptSwi : {{scriptSwi}}<br>
+              scriptSwi : {{scriptSwi}}<br> -->
             </v-flex>
             <v-col justify="center" align="center" style="width:auto; height:100%;">
 
@@ -74,7 +74,7 @@
           <v-spacer/>
           <v-col style="width:100%;">
             <v-flex style="background-color:yellow;" >
-              방문자 님의 성함은? {{ btnSwi }}
+              방문자 님의 성함은?
             </v-flex>
             <v-row style="background-color:red;">
               <v-col cols="3">
