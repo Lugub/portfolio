@@ -26,7 +26,7 @@
             </v-flex>
             <v-col justify="center" align="center" style="width:auto; height:100%;">
 
-              <v-row class="yes-or-no" v-if="yeswindow">
+              <v-row class="yes-or-no" v-if="yesWindow">
                 <v-col style="width:30%;">
                   <v-flex class="yespointer" :class="{'yes-or-no-pointer': yesnoswi}">
 
@@ -148,11 +148,11 @@ export default {
     ],
 
     //event cnt
-    timecnt:2,
-    seosoncnt:3,
-    namesetcnt:14,
-    namecheckcnt:15,
-    endcnt:20,
+    timeCnt:2,
+    seosonCnt:3,
+    nameSetCnt:14,
+    nameCheckCnt:15,
+    endCnt:20,
     //script
     doctorScript:[
       '.... ... ... ... ... ...',                         // 0
@@ -179,7 +179,7 @@ export default {
 
     ],
     currentScript:'... ... ...',
-    scriptCnt:12,
+    scriptCnt:0,
     currentScriptCnt:0,
     scriptProceeder:null,
 
@@ -191,11 +191,11 @@ export default {
     btnSwi:false,
 
     //yes or no
-    yeswindow:false,
+    yesWindow:false,
     yesnoswi:true,
 
     //set name
-    nameChar:['□','□','□','□','□','□','□','□','□'],
+    nameChar:['?','?','?','?','?','?','?','?','?'],
     name: '루겁',
     nameCursor:0,
     nameCursorRow:0,
@@ -206,11 +206,8 @@ export default {
     nameWindowSwi:false,
     deleteswi:false,
     confirmswi:false,
-    //HiddenName
-    hiddenName:[
-      '루겁',
-    ],
 
+    //HiddenName
     cTable:[
       ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ',' ','ㅏ','ㅑ','ㅓ','ㅕ','ㅗ','ㅛ','ㅜ'],
       ['ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ',' ','ㅠ','ㅡ','ㅣ','ㅐ','ㅒ','ㅔ','ㅖ'],
@@ -246,7 +243,7 @@ export default {
       // alert("space Pressed");
       if(e.keyCode != 32)return;
       if(!this.scriptSwi)return;
-      if(this.yeswindow)return;
+      if(this.yesWindow)return;
       if(this.scriptLoadingSwi){
           // alert("Ok Next Script")
           this.currentScript='';
@@ -255,29 +252,31 @@ export default {
       }
     },
 
-
+    // Script 진행하는 함수
     ScriptProceeding:function(){
       // alert("ScriptProceeding!!!")
       this.currentScriptCnt = 0;
       this.scriptCnt++;
       //fade in 해야 함.
-      if(this.scriptCnt == this.seosoncnt+1 ){
+      if(this.scriptCnt == this.seosonCnt+1 ){
         this.scriptSwi = false;
         this.setOpacitySwi = true;
         this.FadeOut();
 
       }
       // name 설정
-      else if(this.scriptCnt == this.namesetcnt){
+      else if(this.scriptCnt == this.nameSetCnt){
         //Script 내려주고
         this.scriptSwi = false;
         this.nameWindowSwi = true;
         window.addEventListener('keyup', this.CursorMove);
       }
       //name 재차 확인
-      else if(this.scriptCnt == this.namecheckcnt){
-        alert("이름 제차 확인");
-        this.doctorScript[this.namecheckcnt] = this.name + " 이(가) 맞습니까?";
+      else if(this.scriptCnt == this.nameCheckCnt){
+        this.doctorScript[this.nameCheckCnt] = ' ';
+        this.$set(this.doctorScript, this.nameCheckCnt, ' ');
+        this.doctorScript[this.nameCheckCnt] = this.name + " 이(가) 맞습니까?";
+        this.scriptProceeder = setInterval(() => this.ScriptDown(),25);
       }
       // 계속 대사 진행
       else{
@@ -310,10 +309,10 @@ export default {
       this.scriptProceeder = null;
       this.scriptLoadingSwi = true;
 
-      if(this.scriptCnt == this.namecheckcnt){
+      if(this.scriptCnt == this.nameCheckCnt){
 
         this.scriptLoadingSwi = false;
-        this.yeswindow = true;
+        this.yesWindow = true;
 
       }
 
@@ -329,7 +328,7 @@ export default {
       let Hour = time.getHours();
       let Day = time.getDate();
 
-      this.doctorScript[this.timecnt] = " 현재 시각 " + Year + "년 " + (Month+1) + "월 " + (Day) + "일 " + Hour + "시..  ";
+      this.doctorScript[this.timeCnt] = " 현재 시각 " + Year + "년 " + (Month+1) + "월 " + (Day) + "일 " + Hour + "시..  ";
 
       let hourment = '';
       if(Hour < 4){
@@ -355,14 +354,14 @@ export default {
       }else if(Hour == 24 ){
         hourment = this.timement[8];
       }
-      this.doctorScript[this.seosoncnt] = this.seosonment[Month] + ", " + hourment + '\n' + "  방문해 주셨습니다...   ";
+      this.doctorScript[this.seosonCnt] = this.seosonment[Month] + ", " + hourment + '\n' + "  방문해 주셨습니다...   ";
 
     },
 
     // name
     setNameBorder:function(index){
       let ret = ''
-      if(this.nameChar[index] == '□'){
+      if(this.nameChar[index] == '?'){
         ret = 'set-name-td-transparent';
       }
 
@@ -604,66 +603,74 @@ export default {
       }
     },
 
+    // 정정버튼
     DeleteName:function(){
       //만약 현재 커서에 없을 경우 커서를 내리고 이전을 전부 제거
-      if(this.nameChar[this.nameCursor] == '□'){
-        this.$set(this.nameChar, --this.nameCursor, '□');
+      if(this.nameChar[this.nameCursor] == '?'){
+        this.$set(this.nameChar, --this.nameCursor, '?');
       }
 
       //만약 아닐 경우 해당 커서만 바꿈.
       else{
-        this.$set(this.nameChar, this.nameCursor, '□');
+        this.$set(this.nameChar, this.nameCursor, '?');
       }
       this.nameCho = '';
       this.nameJung = '';
       this.nameJong = '';
     },
 
-    //
+    // 이름 윈도우에서 결정을 했을 때
     SetNameConfirm:function(){
+      // 이름
+      let name=' ';
 
+      for(var index = 0; index < this.nameChar.length; index++){
+        if(this.nameChar[index] == '?')continue
+        name+= this.nameChar[index];
+      }
+      this.name = name;
+      this.scriptSwi = true;
+      this.nameWindowSwi = false;
       window.removeEventListener('keyup', this.CursorMove);
+      this.ScriptProceeding();
     },
 
     // yes or no functions
     YesOrNoPointer:function(e){
-      if(!this.yeswindow)return;
+      if(!this.yesWindow)return;
       if(e.keyCode == 40 || e.keyCode == 38){
           this.yesnoswi = !this.yesnoswi;
       }
       // 선택
       if(e.keyCode == 32 ){
-        this.yeswindow= false;
+        this.yesWindow= false;
 
         // 예 선택
         if(this.yesnoswi){
           //이름 저장
-          let name = '';
-          for(var i = 0; i < this.nameChar.length; i++){
-              name += this.nameChar[i];
-          }
-          this.setCurrentUserName(name);
+          this.setCurrentUserName(this.name);
 
           // Script 진행
-          if(name == '루겁'){
+          if(this.name == '루겁'){
             // Hidden Page로 이동
 
           }else{
             // 진행
-
+            this.ScriptProceeding();
           }
         }
         // 아니오 선택
         else{
           // 다시 아이디 선택 창으로.
-          this.nameChar = [];
+          this.nameChar = ['?','?','?','?','?','?','?','?','?'];
           this.nameCursor = 0;
           this.nameCho = '';
           this.nameJung = '';
           this.nameJong = '';
 
           //ScriptCnt를 앞으로 돌려서 창이나오게 하기
-          this.scriptCnt = this.namesetcnt;
+          this.scriptCnt = this.nameSetCnt-2;
+          this.ScriptProceeding();
         }
       }
     }
