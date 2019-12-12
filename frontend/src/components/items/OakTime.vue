@@ -152,7 +152,7 @@ export default {
     seosonCnt:3,
     nameSetCnt:14,
     nameCheckCnt:15,
-    endCnt:20,
+    endCnt:21,
     //script
     doctorScript:[
       '.... ... ... ... ... ...',                         // 0
@@ -179,7 +179,7 @@ export default {
 
     ],
     currentScript:'... ... ...',
-    scriptCnt:0,
+    scriptCnt:18,
     currentScriptCnt:0,
     scriptProceeder:null,
 
@@ -238,6 +238,14 @@ export default {
   },
   methods:{
     ...mapActions("data", ["searchMovies","setCurrentTime","setCurrentUserName"]),
+
+    playSound (sound) {
+      if(sound) {
+        var audio = new Audio(sound);
+        audio.play();
+      }
+    },
+
     // space눌렀을 때
     ScriptControll:function(e){
       // alert("space Pressed");
@@ -277,6 +285,10 @@ export default {
         this.$set(this.doctorScript, this.nameCheckCnt, ' ');
         this.doctorScript[this.nameCheckCnt] = this.name + " 이(가) 맞습니까?";
         this.scriptProceeder = setInterval(() => this.ScriptDown(),25);
+      }
+      else if(this.scriptCnt == this.endCnt){
+
+        this.$router.push({ name: 'animation' });
       }
       // 계속 대사 진행
       else{

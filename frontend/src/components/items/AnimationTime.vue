@@ -8,11 +8,19 @@
         <v-btn @click="resetTimer">resetTimer</v-btn>
         <v-flex>Time : {{totalTime.toFixed(2)}}</v-flex>
         <v-flex>Check : {{check}} </v-flex>
+        <v-btn @click.prevent="playSound('../bgms/battlestart.mp3')"></v-btn>
+        <audio src="http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02-128k.mp3" @timeupdate="totalTime = $event.target.currentTime" ref="audio" controls></audio>
+        <audio @timeupdate="totalTime = $event.target.currentTime" ref="audio" controls>
+          <source src="../bgms/battlestart.mp3" type="audio/mp3"/>
+        </audio>
       </v-flex>
     </v-flex>
 
+    <!-- 로딩 창 -->
+    <v-layout>
 
 
+    </v-layout>
   </v-container>
 </template>
 
@@ -24,6 +32,7 @@ export default {
     totalTime:0,
     timer:null,
     check:'',
+    time:0,
   }),
   components: {
 
@@ -40,6 +49,11 @@ export default {
         // alert(val);
       }else if(val < 5 && val >= 4.99){
         // alert(val);
+      }
+    },
+    time(time){
+      if (Math.abs(time - this.$refs.audio.currentTime) > 0.5) {
+        this.$refs.audio.currentTime = time
       }
     }
   },
@@ -61,7 +75,14 @@ export default {
       this.totalTime=0;
       clearInterval(this.timer);
       this.timer = null;
-    }
+    },
+    playSound (sound) {
+      if(sound) {
+        var audio = new Audio(sound);
+        audio.play();
+      }
+    },
+
   }
 };
 </script>
