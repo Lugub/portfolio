@@ -131,7 +131,9 @@
     <audio @timeupdate="bgmtime = $event.target.currentTime" ref="backgroundaudio" controls style="display:none">
       <source src="../bgms/victory.mp3" type="audio/mp3"/>
     </audio>
-
+    <audio @timeupdate="bgmtime = $event.target.currentTime" ref="tikaudio" controls style="display:none">
+      <source src="../bgms/tik.mp3" type="audio/mp3"/>
+    </audio>
   </v-container>
 </template>
 
@@ -300,6 +302,7 @@ export default {
           // alert("Ok Next Script")
           this.currentScript='';
           this.scriptLoadingSwi=false;
+          this.$refs.tikaudio.play();
           this.ScriptProceeding();
       }
     },
