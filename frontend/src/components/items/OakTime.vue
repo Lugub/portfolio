@@ -1,6 +1,6 @@
 <!-- 영화 검색 페이지 -->
 <template>
-  <v-container grid-list-md text-center class="goldfont TimeWindow">
+  <v-container grid-list-md text-center class="goldfont TimeWindow" :class="{OakTimeEndBlink : endswi}" >
     <v-row justify="center" align="center" style="width:100%; height:100%">
       <v-spacer/>
       <v-flex class="OakWindow" :class="{OakBlind: blackSwi}"  >
@@ -102,11 +102,11 @@
         </v-flex>
         <v-row style="background-color:grey; height:10%; width:95%;" justify="center" align="center">
           <v-spacer/>
-          <v-flex :class="{'set-name-cursor': setBtnDelBorder()}">
+          <v-flex class="set-name-cursor-border" :class="{'set-name-cursor': setBtnDelBorder()}">
             정정
           </v-flex>
           <v-spacer/>
-          <v-flex :class="{'set-name-cursor': setBtnConfBorder()}">
+          <v-flex class="set-name-cursor-border" :class="{'set-name-cursor': setBtnConfBorder()}">
             결정
           </v-flex>
           <v-spacer/>
@@ -114,6 +114,23 @@
         </v-row>
       </v-col>
     </v-layout>
+
+    <v-layout class="fade-out-window">
+
+        <v-col v-for="numbercol in 10" v-bind:key="numbercol"  >
+          <v-row v-for="numberrow in 10" v-bind:key="numberrow" justify="space-between" style="width:10vw; height:9.8vh; padding:0 0 0 0" :class="{OakTimeEndFadeOut:fadeOutTable[numberrow * 10 + numbercol - 10]}">
+            block
+          </v-row>
+        </v-col>
+
+    </v-layout>
+
+    <audio @timeupdate="oakfinaltime = $event.target.currentTime" ref="oakfinalaudio" controls style="display:none">
+      <source src="../bgms/battlestart.mp3" type="audio/mp3"/>
+    </audio>
+    <audio @timeupdate="bgmtime = $event.target.currentTime" ref="backgroundaudio" controls style="display:none">
+      <source src="../bgms/victory.mp3" type="audio/mp3"/>
+    </audio>
 
   </v-container>
 </template>
@@ -127,10 +144,13 @@ export default {
   },
   mounted:function(){
     this.SetCurrentTime();
+    this.SetFadeOutTableFalse();
     window.addEventListener('keyup', this.ScriptControll)
     window.addEventListener('keyup', this.YesOrNoPointer)
   },
   data: () => ({
+    oakfinaltime:0,
+    bgmtime:0,
     fadeinswi:false,
 
     //time ment
@@ -179,7 +199,7 @@ export default {
 
     ],
     currentScript:'... ... ...',
-    scriptCnt:18,
+    scriptCnt:0,
     currentScriptCnt:0,
     scriptProceeder:null,
 
@@ -207,7 +227,10 @@ export default {
     deleteswi:false,
     confirmswi:false,
 
-    //HiddenName
+    //EndOakTime
+    endswi:false,
+    fadeoutswi:false,
+
     cTable:[
       ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ',' ','ㅏ','ㅑ','ㅓ','ㅕ','ㅗ','ㅛ','ㅜ'],
       ['ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ',' ','ㅠ','ㅡ','ㅣ','ㅐ','ㅒ','ㅔ','ㅖ'],
@@ -224,9 +247,13 @@ export default {
 
     cJung:{'ㅏ':1,'ㅐ':2,'ㅑ':3,'ㅒ':4,'ㅓ':5,'ㅔ':6,'ㅕ':7,'ㅖ':8,'ㅗ':9,'ㅘ':10,'ㅙ':11,'ㅚ':12,'ㅛ':13,'ㅜ':14,'ㅝ':15,'ㅞ':16,
            'ㅟ':17,'ㅠ':18,'ㅡ':19,'ㅢ':20,'ㅣ':21},
-   cJong:{'':1, 'ㄱ':2, 'ㄲ':3, 'ㄳ':4, 'ㄴ':5, 'ㄵ':6, 'ㄶ':7, 'ㄷ':8, 'ㄹ':9, 'ㄺ':10, 'ㄻ':11, 'ㄼ':12, 'ㄽ':13, 'ㄾ':14
+    cJong:{'':1, 'ㄱ':2, 'ㄲ':3, 'ㄳ':4, 'ㄴ':5, 'ㄵ':6, 'ㄶ':7, 'ㄷ':8, 'ㄹ':9, 'ㄺ':10, 'ㄻ':11, 'ㄼ':12, 'ㄽ':13, 'ㄾ':14
             , 'ㄿ':15, 'ㅀ':16, 'ㅁ':17, 'ㅂ':18, 'ㅄ':19, 'ㅅ':20, 'ㅆ':21, 'ㅇ':22, 'ㅈ':23, 'ㅊ':24, 'ㅋ':25, 'ㅌ':26, 'ㅍ':27
-            , 'ㅎ':28}
+            , 'ㅎ':28},
+    fadeOutTable:[],
+    fadeOutProceeder:null,
+    fadeOutCnt:0,
+    fadeOutTableCnt:[1,11,21,31,41,51,61,71,81,91,92,93,94,95,96,97,98,99,100,90,80,70,60,50,40,30,20,10,9,8,7,6,5,4,3,2,12,22,32,42,52,62,72,82,83,84,85,86,87,88,89,79,69,59,49,39,29,19,18,17,16,15,14,13,23,33,43,53,63,73,74,75,76,77,78,68,58,48,38,28,27,26,25,24,34,44,54,64,65,66,67,57,47,37,36,35,45,55,56,46],
   }),
   watch:{
     currentScriptCnt:function(val){
@@ -235,16 +262,33 @@ export default {
       }
       this.currentScript += ( this.doctorScript[this.scriptCnt][val] == undefined ) ? '' : this.doctorScript[this.scriptCnt][val];
     },
+    oakfinaltime:function(val){
+
+      if(val >= 6){
+        this.$router.push({ name: 'animation' });
+      }
+      else if(val >= 2.5){
+        if(!this.fadeoutswi){
+          this.fadeoutswi=true;
+        }
+      }
+      else if(val >= 2){
+        this.endswi=false;
+        this.fadeoutswi=true;
+      }
+      else{
+        this.endswi=true;
+      }
+    },
+    fadeoutswi:function(val){
+      if(val){
+        // alert(val + "!!")
+        this.SnailFadeOut();
+      }
+    }
   },
   methods:{
     ...mapActions("data", ["searchMovies","setCurrentTime","setCurrentUserName"]),
-
-    playSound (sound) {
-      if(sound) {
-        var audio = new Audio(sound);
-        audio.play();
-      }
-    },
 
     // space눌렀을 때
     ScriptControll:function(e){
@@ -265,6 +309,7 @@ export default {
       // alert("ScriptProceeding!!!")
       this.currentScriptCnt = 0;
       this.scriptCnt++;
+      // this.PlayTalkSound();
       //fade in 해야 함.
       if(this.scriptCnt == this.seosonCnt+1 ){
         this.scriptSwi = false;
@@ -286,15 +331,18 @@ export default {
         this.doctorScript[this.nameCheckCnt] = this.name + " 이(가) 맞습니까?";
         this.scriptProceeder = setInterval(() => this.ScriptDown(),25);
       }
+      // 마지막 일 때
       else if(this.scriptCnt == this.endCnt){
-
-        this.$router.push({ name: 'animation' });
+        this.StopBGMSound();
+        this.EndOakTime();
       }
       // 계속 대사 진행
       else{
         this.scriptProceeder = setInterval(() => this.ScriptDown(),25);
       }
     },
+
+
 
     FadeOut:function(){
       setTimeout(()=> this.FadeOutOther(),5000);
@@ -304,6 +352,7 @@ export default {
     FadeOutOther:function(){
       this.scriptSwi = true;
       this.ScriptProceeding();
+      this.PlayBGMSound();
     },
 
     FadeOutBlack:function(){
@@ -313,6 +362,14 @@ export default {
     ScriptDown:function(){
       this.currentScriptCnt++;
     },
+
+    PlayBGMSound:function(){
+      this.$refs.backgroundaudio.play();
+    },
+    StopBGMSound:function(){
+      this.$refs.backgroundaudio.pause();
+    },
+
 
     //script 중단, 스페이스누를때까지 대기상태
     ScriptStop:function(){
@@ -328,6 +385,58 @@ export default {
 
       }
 
+    },
+
+    //OakTime  끝날때
+    EndOakTime:function(){
+      //번쩍번쩍 과 동시에 브금 시작
+      // 블록하나씩 거매지면서 FadeOut,
+      // 전부 FadeOut하면 라우터 전환
+      this.PlayLastSound();
+
+    },
+    // 음악 재생,
+    PlayLastSound () {
+      this.$refs.oakfinalaudio.play();
+    },
+
+    // 달팽이 fadeout 시작
+    SnailFadeOut: function(){
+      // 무슨 문제인지 모르겠지만 FadeOut이 차례차례실행되지 않고 전체적으로 동시에 실행되서 ㅈ망.
+      // var row = 1, col = 0, n = 10, value = 1;
+      // var inc = 1;
+      // var i, j;
+      //
+      // while( n > 0){
+      //   for(i = 1; i <= n; i++){
+      //     col += inc;
+      //     setTimeout(this.SetSnailTrue(row*10 + col - 10), 25 * value);
+      //     value++;
+      //   }
+      //   n--;
+      //   if(n == 0)break;
+      //   for(i = 1; i <= n; i++){
+      //     row += inc;
+      //      setTimeout(this.SetSnailTrue(row*10 + col - 10), 25 * value);
+      //     value++;
+      //   }
+      //   inc *= -1;
+      // }
+
+
+      setTimeout(this.SetSnailTrue,0)
+    },
+
+    SetSnailTrue: function(){
+      if(this.fadeOutCnt >= 100){
+        clearTimeout(this.fadeOutProceeder);
+        this.fadeOutProceeder = null;
+        return ;
+      }
+      // this.fadeOutTable[this.fadeOutTableCnt[this.fadeOutCnt++]] = true;
+      this.$set(this.fadeOutTable, this.fadeOutTableCnt[this.fadeOutCnt++], true);
+      this.fadeOutProceeder = setTimeout(this.SetSnailTrue, 25);
+      // this.fadeOutTable[val] = true;
     },
 
     SetCurrentTime:function(){
@@ -614,7 +723,15 @@ export default {
         return ;
       }
     },
-
+    //
+    SetFadeOutTableFalse:function(){
+      for( var index = 1 ; index <= 10; index++){
+        for(var jndex = 1; jndex <= 10; jndex++){
+          // this.fadeOutTable[index*10 + jndex - 10] = false;
+          this.$set(this.fadeOutTable, index*10 + jndex - 10, false);
+        }
+      }
+    },
     // 정정버튼
     DeleteName:function(){
       //만약 현재 커서에 없을 경우 커서를 내리고 이전을 전부 제거
@@ -768,6 +885,7 @@ export default {
 .blink {
     -webkit-animation: blink 2s linear infinite;
 }
+
 @-webkit-keyframes blink {
     0% { color: black; }
     25% {color: white; }
@@ -840,6 +958,10 @@ export default {
 }
 
 .set-name-box{
+  border: 2px solid rgba(0, 0, 0, 0);
+}
+
+.set-name-cursor-border{
   border: 2px solid rgba(0, 0, 0, 0);
 }
 
@@ -917,5 +1039,46 @@ export default {
 .name-window-on{
   opacity:1 !important;
 }
+
+.OakTimeEndBlink{
+  -webkit-animation: backgroundblink 0.5s linear infinite;
+}
+
+.OakTimeEndFadeOut{
+  background-color: black !important;
+}
+
+.fade-out-window{
+  color:rgba(0,0,0,0);
+  background-color:rgba(0,0,0,0);
+  opacity:1;
+  position:absolute;
+  width:100%;
+  height:100%;
+  left:0%;
+  top:0%;
+  font-size:1.5em;
+  transition: none;
+}
+
+
+@-webkit-keyframes backgroundblink {
+  0% {
+    opacity: 1;
+  }
+  25%{
+    opacity:1;
+  }
+  50% {
+    opacity: 0;
+  }
+  75%{
+    opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+
 
 </style>

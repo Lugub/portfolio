@@ -8,11 +8,12 @@
         <v-btn @click="resetTimer">resetTimer</v-btn>
         <v-flex>Time : {{totalTime.toFixed(2)}}</v-flex>
         <v-flex>Check : {{check}} </v-flex>
-        <v-btn @click.prevent="playSound('../bgms/battlestart.mp3')"></v-btn>
+        <v-btn @click.prevent="playSound()"></v-btn>
         <audio src="http://www.music.helsinki.fi/tmt/opetus/uusmedia/esim/a2002011001-e02-128k.mp3" @timeupdate="totalTime = $event.target.currentTime" ref="audio" controls></audio>
         <audio @timeupdate="totalTime = $event.target.currentTime" ref="audio" controls>
           <source src="../bgms/battlestart.mp3" type="audio/mp3"/>
         </audio>
+
       </v-flex>
     </v-flex>
 
@@ -76,11 +77,8 @@ export default {
       clearInterval(this.timer);
       this.timer = null;
     },
-    playSound (sound) {
-      if(sound) {
-        var audio = new Audio(sound);
-        audio.play();
-      }
+    playSound () {
+      this.$refs.audio.play();
     },
 
   }
