@@ -201,7 +201,7 @@ export default {
 
     ],
     currentScript:'... ... ...',
-    scriptCnt:0,
+    scriptCnt:18,
     currentScriptCnt:0,
     scriptProceeder:null,
 
